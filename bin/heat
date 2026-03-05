@@ -1,0 +1,62 @@
+#!/bin/bash
+# Description: checks if your GPU is chilling or not
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+get_temp() {
+    local temp_path="$1"
+    if [[ -f "$temp_path" ]]; then
+        local raw_temp=$(cat "$temp_path")
+        echo $((raw_temp / 1000))
+    else
+        echo "N/A"
+    fi
+}
+
+# try to find GPU temp
+gpu_temp="N/A"
+for f in /sys/class/drm/card*/device/hwmon/hwmon*/temp1_input; do
+    if [[ -f "$f" ]]; then
+        gpu_temp=$(get_temp "$f")
+        break
+    fi
+done
+
+# CPU temp
+cpu_temp=$(get_temp "/sys/class/thermal/thermal_zone0/temp")
+
+echo -e "${CYAN}--- Thermal Report ---${NC}"
+echo -ne "CPU: "
+if [[ "$cpu_temp" == "N/A" ]]; then
+    echo -e "${YELLOW}Unknown${NC}"
+elif [ "$cpu_temp" -gt 80 ]; then
+    echo -e "${RED}${cpu_temp}°C (LAVA)${NC}"
+elif [ "$cpu_temp" -gt 60 ]; then
+    echo -e "${YELLOW}${cpu_temp}°C (Sweating)${NC}"
+else
+    echo -e "${GREEN}${cpu_temp}°C (Chilling)${NC}"
+fi
+
+echo -ne "GPU: "
+if [[ "$gpu_temp" == "N/A" ]]; then
+    echo -e "${YELLOW}Not found (Probably an iGPU or hiding)${NC}"
+elif [ "$gpu_temp" -gt 75 ]; then
+    echo -e "${RED}${gpu_temp}°C (Are you mining crypto again?)${NC}"
+elif [ "$gpu_temp" -gt 55 ]; then
+    echo -e "${YELLOW}${gpu_temp}°C (Working hard or hardly working?)${NC}"
+else
+    echo -e "${GREEN}${gpu_temp}°C (Ice cold)${NC}"
+fi
+
+if [[ "$gpu_temp" != "N/A" && "$gpu_temp" -gt 70 ]]; then
+    echo -e "
+${RED}WARN: You should check your thermals, something's not right!${NC}"
+elif [[ "$cpu_temp" != "N/A" && "$cpu_temp" -lt 40 ]]; then
+    echo -e "
+${GREEN}Status: You're chilling.${NC}"
+fi

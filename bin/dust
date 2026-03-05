@@ -1,0 +1,47 @@
+#!/bin/bash
+# Description: a silly reminder to clean your fans (triggers every 30 days-ish).
+
+RED='\033[0;31m'
+NC='\033[0m'
+
+DUST_FILE="$HOME/.dustfile"
+
+if [ "$1" == "--check" ]; then
+    # internal check called by shell start
+    NOW=$(date +%s)
+    
+    if [ ! -f "$DUST_FILE" ]; then
+        # first run, set it to 30 days in the future? 
+        # no, let's just mark it now and start the 30 day timer.
+        echo "$NOW" > "$DUST_FILE"
+        exit 0
+    fi
+    
+    LAST_TIME=$(cat "$DUST_FILE")
+    # base 30 days = 2592000s
+    # random variance +/- 3 days = 259200s
+    # bash's $RANDOM is 0-32767
+    RND=$(( RANDOM % 518400 ))
+    VARIANCE=$(( RND - 259200 ))
+    TRIGGER=$(( 2592000 + VARIANCE ))
+    
+    if [ $((NOW - LAST_TIME)) -ge $TRIGGER ]; then
+        echo -e "\n${RED}[DUST ALERT]${NC} clean my fans.. i cant even breathe."
+        echo "$NOW" > "$DUST_FILE"
+    fi
+else
+    # manual run
+    LAST_TIME=$(cat "$DUST_FILE" 2>/dev/null || echo "never")
+    if [ "$LAST_TIME" != "never" ]; then
+        # date -d is Linux/GNU specific, so it might fail on MacOS
+        LAST_DATE=$(date -d "@$LAST_TIME" 2>/dev/null || date -r "$LAST_TIME" 2>/dev/null || echo "Unknown date")
+        echo "Last fan cleaning registered: $LAST_DATE"
+        
+        NOW=$(date +%s)
+        ELAPSED=$((NOW - LAST_TIME))
+        DAYS=$((ELAPSED / 86400))
+        echo "It has been $DAYS days since your last cleanup."
+    else
+        echo "No fan cleaning history found."
+    fi
+fi

@@ -1,0 +1,75 @@
+#!/bin/bash
+# Description: Shows all available commands and what they do.
+
+# Colors
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# Find the directory where the tools are located
+# If installed, bin is in ~/.local/bin and core.sh is in ~/.local/share/virexclitools/
+# If in dev, we can try to guess based on script location
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CORE_SH=""
+
+if [[ "$BIN_DIR" == *"/virexclitools/bin" ]]; then
+    # Dev environment
+    CORE_SH="$(cd "$BIN_DIR/../scripts" && pwd)/core.sh"
+    BIN_DIR="$BIN_DIR"
+elif [[ "$BIN_DIR" == "$HOME/.local/bin" ]]; then
+    # Installed environment
+    CORE_SH="$HOME/.local/share/virexclitools/core.sh"
+else
+    # Fallback/Unknown - try to find core.sh in standard install path
+    if [[ -f "$HOME/.local/share/virexclitools/core.sh" ]]; then
+        CORE_SH="$HOME/.local/share/virexclitools/core.sh"
+    fi
+fi
+
+echo -e "${BLUE}--- virexclitools core help ---${NC}"
+echo -e "A collection of handy CLI tools for humans who hate typing.
+"
+
+echo -e "${YELLOW}Shell Functions (Core):${NC}"
+if [[ -f "$CORE_SH" ]]; then
+    # Parse core.sh for functions and descriptions
+    # We look for "# Description: ..." followed by the function name
+    while read -r line; do
+        if [[ "$line" =~ ^#\ Description:\ (.*) ]]; then
+            desc="${BASH_REMATCH[1]}"
+        elif [[ "$line" =~ ^([a-zA-Z0-9_-]+)\(\)\ \{ ]]; then
+            func_name="${BASH_REMATCH[1]}"
+            if [[ -n "$desc" ]]; then
+                printf "  ${CYAN}%-18s${NC} %s
+" "$func_name" "$desc"
+                desc=""
+            fi
+        fi
+    done < "$CORE_SH"
+else
+    echo "  (core.sh not found)"
+fi
+
+echo -e "
+${YELLOW}Binary Tools:${NC}"
+for cmd_path in "$BIN_DIR"/*; do
+    cmd_name=$(basename "$cmd_path")
+    # Skip directories and the 'core' command itself to avoid redundancy, 
+    # though it might be nice to show it.
+    if [[ -f "$cmd_path" && "$cmd_name" != "core" ]]; then
+        desc=$(grep "^# Description: " "$cmd_path" | head -n 1 | sed 's/^# Description: //')
+        if [[ -n "$desc" ]]; then
+            printf "  ${GREEN}%-18s${NC} %s
+" "$cmd_name" "$desc"
+        else
+            printf "  ${GREEN}%-18s${NC} (no description)
+" "$cmd_name"
+        fi
+    fi
+done
+
+echo -e "
+${BLUE}-------------------------------${NC}"
+echo -e "Run any command with --help (if supported) for more info."

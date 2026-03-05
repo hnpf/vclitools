@@ -1,0 +1,18 @@
+#!/bin/bash
+# Description: Beautiful ASCII weather. Auto-detects or uses last city.
+CITY_FILE="$HOME/.virex_weather_city"
+CITY="$1"
+
+if [ -z "$CITY" ]; then
+    if [ -f "$CACHE_FILE" ]; then
+        CITY=$(cat "$CACHE_FILE")
+    fi
+fi
+
+if [ -n "$CITY" ]; then
+    echo "$CITY" > "$CACHE_FILE"
+    curl -s "wttr.in/$CITY?0"
+else
+    # auto-detect location if no city provided/saved
+    curl -s "wttr.in?0"
+fi

@@ -1,0 +1,15 @@
+#!/bin/bash
+# Description: Lists and sorts the largest folders in the current directory with colors.
+# Colors
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+echo -e "${CYAN}--- Largest items in current directory ---${NC}"
+# Use du -sh and sort with -h (human readable)
+# Sorting by size and showing the top 20
+du -sh ./* 2>/dev/null | sort -hr | head -n 20 | while read -r line; do
+  size=$(echo "$line" | awk '{print $1}')
+  name=$(echo "$line" | awk '{$1=""; print $0}' | sed 's/^ *//')
+  echo -e "${GREEN}${size}${NC}	${name}"
+done

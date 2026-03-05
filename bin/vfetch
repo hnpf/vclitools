@@ -1,0 +1,35 @@
+#!/bin/bash
+# Description: Prints system specs with a side of sass about your USB devices.
+# colors
+MAGENTA='\033[0;35m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+echo -e "${MAGENTA}--- System Garbage Report ---${NC}"
+echo -e "${YELLOW}Host:${NC} '$(hostname)'"
+echo -e "${YELLOW}Kernel:${NC} $(uname -r)"
+echo -e "${YELLOW}Memory:${NC} $(free -h 2>/dev/null | awk '/^Mem:/ {print $3 "/" $2}' || echo "N/A")"
+echo -e "${YELLOW}CPU:${NC} $(lscpu 2>/dev/null | grep 'Model name' | head -1 | sed 's/Model name: *//' || echo "N/A")"
+
+if [ "$(free | awk '/^Mem:/ {print $3/$2 * 100 < 10}')" ]; then
+    echo "Using less than 10% of your RAM? Are you literally just doing nothing?"
+fi
+# try and get USB count
+if command -v lsusb >/dev/null; then
+    usb_count=$(lsusb | wc -l)
+else
+    # fallback to sysfs if lsusb is missing
+    usb_count=$(find /sys/bus/usb/devices/ -maxdepth 1 -type l 2>/dev/null | wc -l)
+fi
+
+echo -e "\n${RED}USB Clusterfuck:${NC}"
+echo "You have ${usb_count} e-waste modules currently plugged into your USB ports."
+
+if [ "$usb_count" -gt 8 ]; then
+  echo "Are you trying to power a small village with those USB ports? Your power supply is seriously yelling.."
+elif [ "$usb_count" -gt 4 ]; then
+  echo "Maybe unplug one of those? Your ports are sweating."
+else
+  echo "Surprisingly little trash today. Keep it up ig?"
+fi

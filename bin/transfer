@@ -1,0 +1,16 @@
+#!/bin/bash
+# Description: Instantly uploads a file and gives you a shareable link.
+if [ -z "$1" ]; then
+    echo "Usage: transfer <file>"
+    exit 1
+fi
+if [ ! -f "$1" ]; then
+    echo "File not found: $1"
+    exit 1
+fi
+
+echo "Uploading $1..."
+# upload to 0x0.st and grab the link
+curl -s -F "file=@$1" https://0x0.st
+echo -e "
+\e[32mDone!\e[0m"

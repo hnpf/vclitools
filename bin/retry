@@ -1,0 +1,11 @@
+#!/bin/bash
+# Description: Runs a command repeatedly until it succeeds.
+if [ -z "$1" ]; then
+    echo "Usage: retry <command> [args...]"
+    exit 1
+fi
+
+until "$@"; do
+    echo -e "\e[33mCommand failed. Retrying in 1 second...\e[0m"
+    sleep 1
+done

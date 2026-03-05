@@ -1,0 +1,51 @@
+#!/bin/bash
+# Description: Smart search. (none): files. -c: current dir. -f/-fw: text/whole word. -fc/-fcw: current dir text/whole word.
+
+EXCLUDES="--exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=build"
+
+show_usage() {
+    echo "Usage: f [flags] <pattern>"
+    echo "Flags:"
+    echo "  (none)  Search for filenames (recursive)"
+    echo "  -c      Search for filenames (current directory only)"
+    echo "  -f      Search for text inside files (recursive)"
+    echo "  -fw     Search for WHOLE WORD text inside files (recursive)"
+    echo "  -fc     Search for text inside files (current directory only)"
+    echo "  -fcw    Search for WHOLE WORD text inside files (current directory only)"
+    exit 1
+}
+
+if [ -z "$1" ]; then
+    show_usage
+fi
+
+case "$1" in
+    -c)
+        shift
+        find . -maxdepth 1 -not -path '*/.*' -iname "*$**" | grep --color=always -i "$*"
+        ;;
+    -fw)
+        shift
+        grep -rniIw $EXCLUDES --color=always "$*" . | sort -t: -k1
+        ;;
+    -f)
+        shift
+        grep -rniI $EXCLUDES --color=always "$*" . | sort -t: -k1
+        ;;
+    -fcw)
+        shift
+        # Search files in current directory only, no recursion
+        find . -maxdepth 1 -type f -not -path '*/.*' -exec grep -niIw --color=always "$*" {} + | sort -t: -k1
+        ;;
+    -fc)
+        shift
+        # Search files in current directory only, no recursion
+        find . -maxdepth 1 -type f -not -path '*/.*' -exec grep -niI --color=always "$*" {} + | sort -t: -k1
+        ;;
+    -*)
+        show_usage
+        ;;
+    *)
+        find . -not -path '*/.*' -iname "*$**" | grep --color=always -i "$*"
+        ;;
+esac

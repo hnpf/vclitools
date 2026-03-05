@@ -1,0 +1,9 @@
+#!/bin/bash
+# Description: removes all Git changes and cleans untracked files. use with caution.
+# git "nah"
+if [ ! -d .git ]; then
+    echo "This is not a git repository."
+    exit 1
+fi
+echo "Deleting all changes and cleaning up..."
+git reset --hard HEAD && git clean -df

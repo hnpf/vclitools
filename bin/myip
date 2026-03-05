@@ -1,0 +1,13 @@
+#!/bin/bash
+# Description: Shows your local and public IP addresses.
+# local IP
+local_ip=$(hostname -I | awk '{print $1}')
+echo "Local IP:  $local_ip"
+
+# public IP
+public_ip=$(curl -s https://ifconfig.me)
+if [ -n "$public_ip" ]; then
+    echo "Public IP: $public_ip"
+else
+    echo "Public IP: Error (check internet connection)"
+fi

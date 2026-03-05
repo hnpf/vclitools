@@ -1,0 +1,8 @@
+#!/bin/bash
+# Description: Fetches quick cheat sheets from cheat.sh.
+if [ -z "$1" ]; then
+    echo "Usage: cheat <topic>"
+    echo "Example: cheat tar"
+    exit 1
+fi
+curl -s "https://cheat.sh/$1"

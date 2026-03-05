@@ -1,0 +1,5 @@
+#!/bin/bash
+# Description: Instantly starts a static web server in the current folder.
+port=${1:-8000}
+echo "Starting static server at http://localhost:$port"
+python3 -m http.server "$port"

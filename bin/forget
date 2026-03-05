@@ -1,0 +1,19 @@
+#!/bin/bash
+# Description: Wipes the last n commands from your history file.
+# wipes last N commands from history
+# this script attempts to modify the history file directly.
+count=${1:-10}
+hist_file="${HISTFILE:-$HOME/.bash_history}"
+if [[ ! -f "$hist_file" ]]; then
+    # try common zsh path if bash one isn't found
+    hist_file="$HOME/.zsh_history"
+fi
+
+if [[ -f "$hist_file" ]]; then
+    # Create a temporary file, remove last lines, and overwrite
+    head -n -"$count" "$hist_file" > "$hist_file.tmp" && mv "$hist_file.tmp" "$hist_file"
+    echo "Removed the last $count commands from $hist_file."
+    echo "Reload your shell or run 'history -r' (bash) or 'fc -R' (zsh) to update."
+else
+    echo "History file not found at $hist_file."
+fi

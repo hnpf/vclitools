@@ -1,0 +1,9 @@
+#!/bin/bash
+# Description: Converts a Unix timestamp to human-readable date.
+if [ -z "$1" ]; then
+    echo "Usage: human <timestamp>"
+    exit 1
+fi
+
+# try Linux date format first, then macOS
+date -d "@$1" 2>/dev/null || date -r "$1" 2>/dev/null || echo "Invalid timestamp: $1"

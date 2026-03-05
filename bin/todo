@@ -1,0 +1,26 @@
+#!/bin/bash
+# Description: Dead-simple todo list. -d <idx> to delete, -c to clear.
+TODO_FILE="$HOME/.virex_todo"
+touch "$TODO_FILE"
+
+if [ -z "$1" ]; then
+    if [ ! -s "$TODO_FILE" ]; then
+        echo "Nothing to do! Enjoy your day. :3"
+    else
+        echo -e "\e[1;34m--- YOUR TODO LIST ---\e[0m"
+        nl -w2 -s'. ' "$TODO_FILE"
+    fi
+elif [ "$1" == "-d" ]; then
+    if [[ "$2" =~ ^[0-9]+$ ]]; then
+        sed -i "${2}d" "$TODO_FILE"
+        echo "Task $2 removed."
+    else
+        echo "Usage: todo -d <index>"
+    fi
+elif [ "$1" == "-c" ]; then
+    > "$TODO_FILE"
+    echo "Todo list cleared!"
+else
+    echo "$*" >> "$TODO_FILE"
+    echo "Added: $*"
+fi
