@@ -14,7 +14,7 @@ NC='\033[0m'
 BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CORE_SH=""
 
-if [[ "$BIN_DIR" == *"/virexclitools/bin" ]]; then
+if [[ "$BIN_DIR" == *"/virexclitools/bin" || "$BIN_DIR" == *"/vclitools/bin" ]]; then
     # Dev environment
     CORE_SH="$(cd "$BIN_DIR/../scripts" && pwd)/core.sh"
     BIN_DIR="$BIN_DIR"

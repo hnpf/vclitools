@@ -1,0 +1,47 @@
+#!/bin/bash
+# Description: Base64 encode/decode utility. -e to encode, -d to decode.
+
+MODE="encode"
+INPUT=""
+
+if [[ "$1" == "-d" ]]; then
+    MODE="decode"
+    shift
+elif [[ "$1" == "-e" ]]; then
+    MODE="encode"
+    shift
+fi
+
+# Remaining arguments are the input string
+INPUT="$*"
+
+if [ -n "$INPUT" ]; then
+    if [ "$MODE" == "decode" ]; then
+        echo -n "$INPUT" | base64 -d 2>/dev/null
+        echo
+    else
+        echo -n "$INPUT" | base64
+    fi
+else
+    # No input string provided as argument, check stdin
+    if [ ! -t 0 ]; then
+        if [ "$MODE" == "decode" ]; then
+            base64 -d 2>/dev/null
+            echo
+        else
+            base64
+        fi
+    else
+        # No input and TTY, show usage
+        echo -e "\e[1;34m--- Base64 Utility ---\e[0m"
+        echo "Usage: base [-e|-d] [string]"
+        echo "  -e  Encode (default)"
+        echo "  -d  Decode"
+        echo ""
+        echo "Examples:"
+        echo "  base -e hello"
+        echo "  echo 'hello' | base -e"
+        echo "  base -d aGVsbG8="
+        exit 1
+    fi
+fi

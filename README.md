@@ -18,6 +18,8 @@ The installer will automatically add the necessary paths to your `.bashrc` or `.
 
 | Command | Description |
 |---------|-------------|
+| `base [-e/-d]` | Base64 encode/decode utility. `-e` to encode, `-d` to decode. |
+| `b64 [-e/-d]` | Alias for `base`. |
 | `up [n]` | Go back `n` directories. Default is 1. No more `cd ../../../` |
 | `mkcd <dir>` | Create a directory and `cd` into it instantly. |
 | `to [target]` | Smart jump. No args: lists all folders. With arg: fuzzy-jumps to matching folder. |
@@ -48,4 +50,5 @@ The installer will automatically add the necessary paths to your `.bashrc` or `.
 - `curl` (for `cheat`, `myip`)
 - `lsof` (for `port-kill`)
 - `du`, `sort` (for `size`)
+- `base64` (for `base`, `b64`)
 - `lsusb` (optional, for `vfetch`)
