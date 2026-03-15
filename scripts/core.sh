@@ -112,9 +112,10 @@ o() {
 }
 
 # Description: re-runs the last command with sudo.
-please() {
-  sudo $(fc -ln -1)
+function please() {
+  \sudo $(fc -ln -1)
 }
+# im crine i hate zsh so much
 
 # export functions if needed, though sourcing handles it
 
